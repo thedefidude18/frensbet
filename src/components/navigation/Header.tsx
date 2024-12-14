@@ -1,69 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { HelpCircle, Settings } from 'lucide-react';
-import MobileMenu from './MobileMenu';
 import WalletConnect from '../wallet/WalletConnect';
 
-interface NavLinkProps {
+interface MenuItemProps {
   to: string;
   children: React.ReactNode;
+  onClick: () => void;
   isActive: boolean;
 }
 
-function NavLink({ to, children, isActive }: NavLinkProps) {
+function MenuItem({ to, children, onClick, isActive }: MenuItemProps) {
   return (
     <Link
       to={to}
-      className={`transition-colors ${
-        isActive
-          ? 'text-blue-500 font-medium'
-          : 'text-gray-600 hover:text-blue-500'
+      className={`py-2 px-4 rounded-lg transition-colors ${
+        isActive ? 'bg-gray-800 text-white' : 'hover:bg-gray-700 text-white'
       }`}
+      onClick={onClick}
     >
       {children}
     </Link>
   );
 }
 
-export default function Header() {
+export default function MobileMenu() {
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const navItems = [
-    { to: '/', label: 'Explore' },
+  const toggleMenu = () => setIsOpen(!isOpen);
+
+  const menuItems = [
+    { to: '/', label: 'Home' },
     { to: '/activities', label: 'Activities' },
-    { to: '/explore', label: 'Create' },
     { to: '/leaderboard', label: 'Leaderboard' },
     { to: '/notifications', label: 'Notifications' },
+    { to: '/explore', label: 'Explore' },
   ];
 
   return (
-    <header className="sticky top-0 bg-[#1a1b1f] z-10 flex justify-between items-center p-4 border-b border-gray-800">
-      <div className="flex items-center gap-2">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="frens.bet" className="h-6" />
-          <span className="font-bold text-blue-500">frensBet</span>
-        </Link>
-      </div>
+    <div className="md:hidden">
+      <button
+        onClick={toggleMenu}
+        className="p-2 bg-white hover:bg-gray-900 rounded-lg transition-colors"
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+      >
+        {isOpen ? <X size={24} color="black" /> : <Menu size={24} color="black" />}
+      </button>
 
-      <MobileMenu />
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 bg-black border-b border-gray-800 shadow-lg">
+          <nav className="flex flex-col p-4">
+            {menuItems.map((item) => (
+              <MenuItem
+                key={item.to}
+                to={item.to}
+                onClick={toggleMenu}
+                isActive={currentPath === item.to}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
 
-      <nav className="hidden md:flex items-center gap-6">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            isActive={currentPath === item.to}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* Ensure WalletConnect is rendered only once */}
-      <div className="hidden md:flex items-center gap-4">
-        <WalletConnect />
-      </div>
-    </header>
+            {/* Add WalletConnect to mobile menu */}
+            <div className="mt-4 border-t border-gray-800 pt-4">
+              <WalletConnect />
+            </div>
+          </nav>
+        </div>
+      )}
+    </div>
   );
 }
