@@ -63,7 +63,7 @@ export default function Explore() {
       <div className="text-center mb-12">
         <div className="flex justify-center mb-4">
           <img
-            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXJ1YnBmbzN1OXN0cTdqZGRpOXJtMXl5dXowbHFtZzR1YmNlbnN1ZiZlcD12YW5kZV9yYW5kb20mcD1naWZfYnlfaWQmY3Q9Zw/blSTtZUAjFMNW/giphy.gif"
+            src="/assets/output-onlinegiftools.gif"
             alt="Cute Pet"
             className="w-24 h-24 rounded-full object-cover"
           />

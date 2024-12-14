@@ -30,11 +30,11 @@ export default function Header() {
   const currentPath = location.pathname;
 
   const navItems = [
-    { to: '/', label: 'Home' },
+    { to: '/', label: 'Explore' },
     { to: '/activities', label: 'Activities' },
     { to: '/leaderboard', label: 'Leaderboard' },
     { to: '/notifications', label: 'Notifications' },
-    { to: '/explore', label: 'Explore' },
+    { to: '/explore', label: 'Create' },
   ];
 
   return (
