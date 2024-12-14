@@ -32,9 +32,9 @@ export default function Header() {
   const navItems = [
     { to: '/', label: 'Explore' },
     { to: '/activities', label: 'Activities' },
+    { to: '/explore', label: 'Create' },
     { to: '/leaderboard', label: 'Leaderboard' },
     { to: '/notifications', label: 'Notifications' },
-    { to: '/explore', label: 'Create' },
   ];
 
   return (

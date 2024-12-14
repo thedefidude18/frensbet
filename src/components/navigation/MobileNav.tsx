@@ -30,9 +30,9 @@ export default function MobileNav() {
   const navItems = [
     { to: '/', icon: <Home size={15} />, label: 'Explore' },
     { to: '/activities', icon: <Activity size={20} />, label: 'Activities' },
+    { to: '/explore', icon: <Bell size={20} />, label: 'Create' },
     { to: '/leaderboard', icon: <Trophy size={20} />, label: 'Leaderboard' },
     { to: '/notifications', icon: <Bell size={20} />, label: 'Notifications' },
-    { to: '/explore', icon: <Bell size={20} />, label: 'Create' },
   ];
 
   return (
