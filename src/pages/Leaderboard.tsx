@@ -1,48 +1,74 @@
 import React from 'react';
-import { leaderboardUsers } from '../data/leaderboard';
+import { leaderboardUsers } from '../data/leaderboardUsers';
 
-const Leaderboard = () => {
+export default function Leaderboard() {
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="px-6 py-8">
-        <h1 className="text-3xl font-bold mb-6">Leaderboard</h1>
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="b
-trophies: ReactNode;
-name: ReactNode;g-gray-200 text-gray-600 font-medium">
-                <th className="px-4 py-3 text-left">Rank</th>
-                <th className="px-4 py-3 text-left">User</th>
-                <th className="px-4 py-3 text-center">Rank</th>
-                <th className="px-4 py-3 text-center">Trophies</th>
+    <div className="max-w-4xl mx-auto p-6 bg-white">
+
+      <div className="shadow-lg rounded-lg overflow-hidden">
+        <table className="w-full table-auto">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Placement</th>
+              <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Player</th>
+              <th className="py-4 px-6 text-center text-sm font-semibold text-gray-600">Win Streak</th>
+              <th className="py-4 px-6 text-center text-sm font-semibold text-gray-600">Total Wins</th>
+              <th className="py-4 px-6 text-right text-sm font-semibold text-gray-600">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaderboardUsers.map((user) => (
+              <tr
+                key={user.rank}
+                className="hover:bg-gray-50 even:bg-gray-100 transition-colors"
+              >
+                <td className="py-4 px-6 text-sm text-gray-800 font-semibold">
+                  {user.rank < 10 ? `0${user.rank}` : user.rank}
+                </td>
+                <td className="py-4 px-6 text-sm flex items-center gap-4">
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
+                  />
+                  <span className="text-gray-800 font-medium">
+                    {user.username}
+                  </span>
+                </td>
+                <td className="py-4 px-6 text-center text-sm text-gray-800">
+                  {user.winStreak}
+                </td>
+                <td className="py-4 px-6 text-center text-sm text-gray-800">
+                  {user.totalWins}
+                </td>
+                <td className="py-4 px-6 text-right text-sm text-gray-800 font-bold">
+                  {user.score.toLocaleString()} pts
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {leaderboardUsers.map((user, index) => (
-                <tr
-                  key={user.username}
-                  className="border-b hover:bg-gray-100 transition-colors duration-300"
-                >
-                  <td className="px-4 py-3 font-medium">{index + 1}</td>
-                  <td className="px-4 py-3 flex items-center gap-3">
-                    <img
-                      src={user.avatar}
-                      alt={user.username}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span>{user.name}</span>
-                  </td>
-                  <td className="px-4 py-3 text-center">{user.rank}</td>
-                  <td className="px-4 py-3 text-center">{user.trophies}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      <style>{`
+        .table-auto th {
+          border-bottom: 2px solid #e2e8f0; /* Light gray border */
+        }
+
+        .table-auto td {
+          border-bottom: 1px solid #e2e8f0; /* Light gray border */
+        }
+
+        @media (max-width: 768px) {
+          .table-auto th, .table-auto td {
+            padding: 12px 8px; /* Adjust padding for smaller screens */
+          }
+
+          h1 {
+            font-size: 2rem; /* Smaller font size for mobile */
+          }
+        }
+      `}</style>
     </div>
   );
-};
-
-export default Leaderboard;
+}
