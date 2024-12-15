@@ -28,9 +28,9 @@ export default function MobileNav() {
   const currentPath = location.pathname;
 
   const navItems = [
-    { to: '/', icon: '🏠', label: 'Explore' },
-    { to: '/activities', icon: '🏃', label: 'Activities' },
-    { to: '/explore', icon: '🌟', label: 'Create' },
+    { to: '/', icon: '🌟', label: 'Challenge' },
+    { to: '/activities', icon: '🎉', label: 'Activities' },
+    { to: '/home', icon: '🧭', label: 'Explore' },
     { to: '/leaderboard', icon: '🏆', label: 'Ranks' },
     { to: '/notifications', icon: '🔔', label: 'Notifications' }
   ];

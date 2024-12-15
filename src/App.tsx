@@ -16,13 +16,13 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
       <Header />
       <main className="container mx-auto px-4 py-6 max-w-6xl">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/activities" element={<Activities />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/explore" element={<Explore />} />
-        </Routes>
+      <Routes>
+  <Route path="/" element={<Explore />} />
+  <Route path="/home" element={<Home />} />
+  <Route path="/activities" element={<Activities />} />
+  <Route path="/leaderboard" element={<Leaderboard />} />
+  <Route path="/notifications" element={<Notifications />} />
+</Routes>
       </main>
       <MobileNav />
     </div>
