@@ -41,13 +41,13 @@ export default function MobileMenu() {
 
   return (
     <div className="md:hidden">
-      <button
-        onClick={toggleMenu}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        aria-label={isOpen ? 'Close menu' : 'Open menu'}
-      >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+   <button
+  onClick={toggleMenu}
+  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-black"
+  aria-label={isOpen ? 'Close menu' : 'Open menu'}
+>
+  {isOpen ? <X size={24} /> : <Menu size={24} />}
+</button>
 
       {isOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg">

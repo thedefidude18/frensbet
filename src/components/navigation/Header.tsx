@@ -30,15 +30,15 @@ export default function Header() {
   const currentPath = location.pathname;
 
   const navItems = [
-    { to: '/', label: 'Home' },
+    { to: '/', label: 'Explore' },
     { to: '/activities', label: 'Activities' },
-    { to: '/leaderboard', label: 'Leaderboard' },
+    { to: '/explore', label: ' Create' },
+    { to: '/leaderboard', label: 'Ranks' },
     { to: '/notifications', label: 'Notifications' },
-    { to: '/explore', label: 'Explore' },
   ];
 
   return (
-    <header className="sticky top-0 bg-[#1a1b1f] z-10 flex justify-between items-center p-4 border-b border-gray-800">
+    <header className="sticky top-0 bg-[#fffff] z-10 flex justify-between items-center p-2">
       {/* Logo Section */}
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center gap-2">

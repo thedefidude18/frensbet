@@ -104,7 +104,7 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
         <img
           src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=random"
           alt="avatar"
-          className="w-10 h-10 rounded-full"
+          className="w-8 h-8 rounded-full"
         />
         <input
           ref={inputRef}
@@ -134,8 +134,8 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
             <Image size={20} />
           </button>
           <button className="text-gray-400 hover:text-white">
-            <Smile size={20} />
-          </button>
+  🔮
+</button>
         </div>
         <button
           onClick={handlePost}
