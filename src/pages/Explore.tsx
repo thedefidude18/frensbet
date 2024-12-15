@@ -194,7 +194,7 @@ export default function Explore() {
           className="text-gray-600 text-md md:text-xl"
           style={{ fontFamily: 'SF Pro, sans-serif' }}
         >
-          Challenge your frens.
+          Challenge and win your frens. 
         </p>
       </div>
       {/* Compose Box */}
