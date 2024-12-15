@@ -201,7 +201,7 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
         </div>
         <button
           onClick={handlePost}
-          className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-500 flex items-center"
+          className="bg-pink-500 text-white px-4 py-1 rounded-full hover:bg-purple-500 flex items-center"
         >
           <Send size={16} className="mr-2" />
           Challenge
@@ -254,13 +254,13 @@ export default function Explore() {
           />
         </div>
         <h1
-          className="text-4xl md:text-6xl font-bold mb-4"
-          style={{ fontFamily: 'ZCOOL KuaiLe, sans-serif' }}
-        >
-          Bet Your Frens, Earn Crypto
-        </h1>
+  className="text-4xl md:text-6xl font-bold mb-4 text-pink-500"
+  style={{ fontFamily: 'UI Rounded, sans-serif' }}
+>
+  frens.bet
+</h1>
         <p className="text-gray-400 text-lg mb-4">
-          Create challenges with your friends and show off your bets in the community!
+          challenges your frens.
         </p>
       </div>
 
