@@ -29,12 +29,61 @@ function Notification({ message, onClose }: { message: string; onClose: () => vo
   );
 }
 
+function ChallengePreviewModal({
+  isOpen,
+  onClose,
+  challengeDetails,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  challengeDetails: ChallengeDetails | null;
+  onConfirm: () => void;
+}) {
+  if (!isOpen || !challengeDetails) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-[#1a1b1f] text-white p-6 rounded-lg w-full max-w-md shadow-lg">
+        <h2 className="text-xl mb-4">Confirm Challenge</h2>
+        <div className="mb-4">
+          <p>
+            <strong>Challenged User:</strong> {challengeDetails.challengedUser}
+          </p>
+          <p>
+            <strong>Event:</strong> {challengeDetails.event}
+          </p>
+          <p>
+            <strong>Wager:</strong> {challengeDetails.wager.amount} {challengeDetails.wager.currency}
+          </p>
+        </div>
+        <div className="flex justify-between">
+          <button
+            onClick={onClose}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-500"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
   const { address, isConnected } = useAccount(); // Get wallet connection status and address
   const [text, setText] = useState<string>('');
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
   const [showNotification, setShowNotification] = useState(false);
   const [suggestedUsers, setSuggestedUsers] = useState<string[]>([]); // State for suggested users
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [challengeDetails, setChallengeDetails] = useState<ChallengeDetails | null>(null); // State for challenge details
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,17 +101,20 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
 
   const handlePost = () => {
     if (text.trim()) {
-      // Check if wallet is connected
+      // Ensure wallet address is available
       if (!isConnected || !address) {
         alert('Please connect your wallet to post a challenge.');
         return;
       }
-
+  
+      // Ensure `address` is a string by providing a fallback
+      const walletAddress: string = address ?? '';
+  
       // Validate challenge format
       const challengeRegex =
         /@frensbot\s+challenge\s+@(\w+):\s*Event:\s*(.+)\s*Wager:\s*(\d+(\.\d+)?)\s*(\w+)/i;
       const match = text.match(challengeRegex);
-
+  
       if (match) {
         const challengeDetails: ChallengeDetails = {
           challengedUser: match[1],
@@ -72,10 +124,10 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
             currency: match[5],
           },
         };
-
-        // Include wallet address in the post logic
-        onPost(text, challengeDetails, address);
-
+  
+        // Pass `walletAddress` safely
+        onPost(text, challengeDetails, walletAddress);
+  
         setText('');
         setShowNotification(true); // Show notification
         setTimeout(() => setShowNotification(false), 3000); // Auto-hide after 3 seconds
@@ -86,6 +138,18 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
         );
       }
     }
+  };
+  
+
+  const handleModalConfirm = () => {
+    if (challengeDetails) {
+      // Ensure `address` is a string by providing a fallback
+      const walletAddress: string = address ?? ''; // Fallback to empty string if undefined
+      onPost(text, challengeDetails, walletAddress);
+    }
+    setShowModal(false); // Close modal after confirmation
+    setShowNotification(true); // Show notification
+    setTimeout(() => setShowNotification(false), 3000); // Auto-hide after 3 seconds
   };
 
   return (
@@ -133,9 +197,7 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           <button className="text-gray-400 hover:text-white">
             <Image size={20} />
           </button>
-<button className="text-gray-400 hover:text-white">
-  🔮
-</button>
+          <button className="text-gray-400 hover:text-white">🔮</button>
         </div>
         <button
           onClick={handlePost}
@@ -151,6 +213,14 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           onClose={() => setShowNotification(false)}
         />
       )}
+
+      {/* Challenge Preview Modal */}
+      <ChallengePreviewModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        challengeDetails={challengeDetails}
+        onConfirm={handleModalConfirm}
+      />
     </div>
   );
 }
@@ -185,18 +255,15 @@ export default function Explore() {
         </div>
         <h1
           className="text-4xl md:text-6xl font-bold mb-4"
-          style={{ fontFamily: 'UI-Rounded, SF Pro, sans-serif', fontWeight: 600 }}
+          style={{ fontFamily: 'ZCOOL KuaiLe, sans-serif' }}
         >
-          <span className="text-[hotpink]">frens.</span>
-          <span className="text-gray-900">bet</span>
+          Bet Your Frens, Earn Crypto
         </h1>
-        <p
-          className="text-gray-600 text-md md:text-xl"
-          style={{ fontFamily: 'SF Pro, sans-serif' }}
-        >
-          Challenge and win your frens. 
+        <p className="text-gray-400 text-lg mb-4">
+          Create challenges with your friends and show off your bets in the community!
         </p>
       </div>
+
       {/* Compose Box */}
       <ComposeBox onPost={addPost} onSuggestUsers={suggestUsers} />
     </div>
