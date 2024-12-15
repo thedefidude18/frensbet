@@ -133,7 +133,7 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           <button className="text-gray-400 hover:text-white">
             <Image size={20} />
           </button>
-          <button className="text-gray-400 hover:text-white">
+<button className="text-gray-400 hover:text-white">
   🔮
 </button>
         </div>
@@ -187,7 +187,7 @@ export default function Explore() {
           className="text-4xl md:text-6xl font-bold mb-4"
           style={{ fontFamily: 'UI-Rounded, SF Pro, sans-serif', fontWeight: 600 }}
         >
-          <span className="text-blue-500">frens.</span>
+          <span className="text-[hotpink]">frens.</span>
           <span className="text-gray-900">bet</span>
         </h1>
         <p

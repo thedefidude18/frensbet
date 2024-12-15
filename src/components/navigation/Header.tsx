@@ -43,7 +43,7 @@ export default function Header() {
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center gap-2">
           <img src="/logo.svg" alt="frens.bet" className="h-6" />
-          <span className="font-bold text-blue-500">frensBet</span>
+          <span className="font-bold text-[hotpink]">frens.Bet</span>
         </Link>
       </div>
 
