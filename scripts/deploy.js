@@ -1,26 +1,25 @@
 async function main() {
-<<<<<<< HEAD
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const Contract = await ethers.getContractFactory("YourContractName");
-  const contract = await Contract.deploy();
-=======
-  // Get the signer's wallet from Hardhat
-  const [deployer] = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
+  const balance = await deployer.getBalance();
+  console.log("Account balance:", ethers.utils.formatEther(balance));
 
-  // Get the contract to deploy (make sure this matches the contract name in your Solidity file)
-  const Contract = await ethers.getContractFactory("SocialBetting"); // Update with your contract name
-  const contract = await Contract.deploy();
+  const Contract = await ethers.getContractFactory("SocialBetting");
 
->>>>>>> c3a4da3 (hardhat22)
+  // Custom gas settings
+  const contract = await Contract.deploy({
+      gasLimit: 5000000, // Set an appropriate gas limit
+      maxPriorityFeePerGas: ethers.utils.parseUnits("30", "gwei"), // Adjust based on current gas requirements
+      maxFeePerGas: ethers.utils.parseUnits("40", "gwei"), // Adjust based on the network conditions
+  });
+
   console.log("Contract deployed to:", contract.address);
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
+      console.error(error);
+      process.exit(1);
   });
