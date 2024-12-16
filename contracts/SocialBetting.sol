@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: MIT
+<<<<<<< HEAD
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+=======
+pragma solidity 0.8.19;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+>>>>>>> c3a4da3 (hardhat22)
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 contract SocialBetting is ReentrancyGuard, Pausable, Ownable {
@@ -188,13 +196,25 @@ contract SocialBetting is ReentrancyGuard, Pausable, Ownable {
             challenge.prediction = _newPrediction;
         }
 
+<<<<<<< HEAD
+=======
+        emit ChallengeModified(_challengeId, _newPrediction, _newWagerAmount);
+    }
+
+    // Update wager amount
+    function updateWager(uint256 _challengeId, uint256 _newWagerAmount) external payable {
+        Challenge storage challenge = challenges[_challengeId]; // Ensure challenge is referenced correctly
+>>>>>>> c3a4da3 (hardhat22)
         if (_newWagerAmount > challenge.wagerAmount) {
             uint256 additionalAmount = _newWagerAmount - challenge.wagerAmount;
             require(msg.value >= additionalAmount, "Insufficient funds");
             challenge.wagerAmount = _newWagerAmount;
         }
+<<<<<<< HEAD
 
         emit ChallengeModified(_challengeId, _newPrediction, _newWagerAmount);
+=======
+>>>>>>> c3a4da3 (hardhat22)
     }
 
     // Create a new bet
@@ -260,4 +280,8 @@ contract SocialBetting is ReentrancyGuard, Pausable, Ownable {
 
         emit BetResolved(betId, winner, totalStake);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c3a4da3 (hardhat22)

@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
+<<<<<<< HEAD
 pragma solidity ^0.8.19;
+=======
+pragma solidity 0.8.19;
+>>>>>>> c3a4da3 (hardhat22)
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
