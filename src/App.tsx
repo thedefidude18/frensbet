@@ -23,7 +23,7 @@ function AppContent() {
   <Route path="/activities" element={<Activities />} />
   <Route path="/leaderboard" element={<Leaderboard />} />
   <Route path="/notifications" element={<Notifications />} />
-  <Route path="/dashboard" element={<Dashboard />} />
+  <Route path="/dashboard" element={<Dashboard userAddress={''} />} />
 
 </Routes>
       </main>

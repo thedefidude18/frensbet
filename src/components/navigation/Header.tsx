@@ -78,13 +78,13 @@ export default function Header() {
 
       {/* Desktop Icons and WalletConnect */}
       <div className="hidden md:flex items-center gap-4">
-        {/* Notifications Icon with Badge */}
-        <Link to="/notifications" className="relative">
-          <Bell size={24} className="text-gray-600 hover:text-blue-500" />
-          {notificationCount > 0 && (
-            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {notificationCount}
-            </span>
+     {/* Notification Icon with Badge */}
+                   <Link to="/notifications" className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors text-black">
+                     <Bell size={24} />
+                     {notificationCount > 0 && (
+                       <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                       {notificationCount}
+                     </span>
           )}
         </Link>
 

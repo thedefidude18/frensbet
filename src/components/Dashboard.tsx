@@ -1,11 +1,8 @@
 // Dashboard.tsx
-import React, { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { getChallenges, withdrawWinnings } from "../api/contractFunctions";
-import { useAccount } from 'wagmi';
 
-// Challenge and Challenges interfaces (keep existing)
+// Challenge and Challenges interfaces
 interface Challenge {
   event: string;
   stake: string;
@@ -22,76 +19,49 @@ interface Challenges {
   resolved: Challenge[];
 }
 
-const Dashboard: React.FC = () => {
-  const { address, isConnected } = useAccount();
-  const [balance, setBalance] = useState<string>('0');
-  const [challenges, setChallenges] = useState<Challenges>({
-    active: [],
-    pending: [],
-    resolved: [],
-  });
-  const [notifications] = useState<string[]>([]);
+// Sample data for challenges and notifications
+const sampleChallenges: Challenges = {
+  active: [
+    { event: 'Challenge 1', stake: '1.0', participants: ['Alice', 'Bob'], timeLeft: '2 days' },
+    { event: 'Challenge 2', stake: '0.5', participants: ['Charlie', 'Dave'], timeLeft: '1 day' },
+  ],
+  pending: [
+    { event: 'Challenge 3', stake: '0.3', invitee: 'Eve', timeLeft: '3 days' },
+  ],
+  resolved: [
+    { event: 'Challenge 4', stake: '0.8', winner: 'Frank', outcome: 'Won' },
+  ],
+};
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!address) return;
+const notifications: string[] = [
+  'You have a new challenge invite.',
+  'Your challenge has been resolved.',
+];
 
-      try {
-        // Create provider and fetch balance
-        const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-        const balance = await provider.getBalance(address);
-        setBalance(ethers.utils.formatEther(balance));
+const ChallengeCard: React.FC<{ challenge: Challenge }> = ({ challenge }) => (
+  <div className="challenge-card">
+    <h3>{challenge.event}</h3>
+    <p><strong>Stake:</strong> {challenge.stake} ETH</p>
+    <p><strong>Participants:</strong> {challenge.participants?.join(' vs ')}</p>
+    <p><strong>Time Left:</strong> {challenge.timeLeft}</p>
+    <button className="btn btn-link">View</button>
+  </div>
+);
 
-        // Fetch challenges
-        const userChallenges = await getChallenges(address);
-        setChallenges(userChallenges);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        alert('Failed to fetch data.');
-      }
-    };
-
-    fetchData();
-  }, [address]);
-
-  const handleWithdraw = async () => {
-    if (!address) return;
-    try {
-      await withdrawWinnings(address);
-      alert('Winnings withdrawn successfully!');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to withdraw winnings.');
-    }
-  };
-
-  if (!isConnected) {
-    return (
-      <div className="dashboard-container">
-        <div className="no-wallet-message">
-          <h2>Wallet Not Connected</h2>
-          <p>Please connect your wallet to view your dashboard</p>
-        </div>
-      </div>
-    );
-  }
-
+// Accept userAddress as a prop
+const Dashboard: React.FC<{ userAddress: string }> = ({ userAddress }) => {
   return (
     <div className="dashboard-container">
       {/* Top Section: User Info */}
       <div className="dashboard-header">
         <h1>Dashboard</h1>
         <div className="user-info">
-          <p><strong>Wallet Address:</strong> {address}</p>
-          <p><strong>Balance:</strong> {balance} ETH</p>
+          <p><strong>Wallet Address:</strong> {userAddress}</p>
+          <p><strong>Balance:</strong> 2.5 ETH</p>
         </div>
         <div className="actions">
           <Link to="/create-challenge" className="btn btn-primary">Create Challenge</Link>
-          <button 
-            onClick={handleWithdraw} 
-            className="btn btn-secondary"
-            disabled={!address}
-          >
+          <button className="btn btn-secondary" disabled>
             Withdraw Winnings
           </button>
         </div>
@@ -101,40 +71,22 @@ const Dashboard: React.FC = () => {
       <div className="challenges-section">
         <h2>Active Challenges</h2>
         <div className="challenge-list">
-          {challenges.active.length ? challenges.active.map((challenge, index) => (
-            <div key={index} className="challenge-card">
-              <h3>{challenge.event}</h3>
-              <p><strong>Stake:</strong> {challenge.stake} ETH</p>
-              <p><strong>Participants:</strong> {challenge.participants?.join(' vs ')}</p>
-              <p><strong>Time Left:</strong> {challenge.timeLeft}</p>
-              <button className="btn btn-link">View</button>
-            </div>
+          {sampleChallenges.active.length ? sampleChallenges.active.map((challenge, index) => (
+            <ChallengeCard key={index} challenge={challenge} />
           )) : <p>No active challenges.</p>}
         </div>
 
         <h2>Pending Challenges</h2>
         <div className="challenge-list">
-          {challenges.pending.length ? challenges.pending.map((challenge, index) => (
-            <div key={index} className="challenge-card">
-              <h3>{challenge.event}</h3>
-              <p><strong>Stake:</strong> {challenge.stake} ETH</p>
-              <p><strong>Invite:</strong> {challenge.invitee}</p>
-              <p><strong>Time Left:</strong> {challenge.timeLeft}</p>
-              <button className="btn btn-link">Resend Invite</button>
-            </div>
+          {sampleChallenges.pending.length ? sampleChallenges.pending.map((challenge, index) => (
+            <ChallengeCard key={index} challenge={challenge} />
           )) : <p>No pending challenges.</p>}
         </div>
 
         <h2>Resolved Challenges</h2>
         <div className="challenge-list">
-          {challenges.resolved.length ? challenges.resolved.map((challenge, index) => (
-            <div key={index} className="challenge-card">
-              <h3>{challenge.event}</h3>
-              <p><strong>Stake:</strong> {challenge.stake} ETH</p>
-              <p><strong>Winner:</strong> {challenge.winner}</p>
-              <p><strong>Outcome:</strong> {challenge.outcome}</p>
-              <button className="btn btn-link">View</button>
-            </div>
+          {sampleChallenges.resolved.length ? sampleChallenges.resolved.map((challenge, index) => (
+            <ChallengeCard key={index} challenge={challenge} />
           )) : <p>No resolved challenges.</p>}
         </div>
       </div>
@@ -145,7 +97,7 @@ const Dashboard: React.FC = () => {
         <ul>
           {notifications.length ? notifications.map((note, index) => (
             <li key={index}>{note}</li>
-          )) : <p>No notifications yet.</p>}
+          )) : <li>No notifications yet.</li>}
         </ul>
       </div>
     </div>

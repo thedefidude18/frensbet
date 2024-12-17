@@ -99,18 +99,15 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
     setSuggestedUsers(suggestions);
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (text.trim()) {
-      // Ensure wallet address is available
       if (!isConnected || !address) {
         alert('Please connect your wallet to post a challenge.');
         return;
       }
   
-      // Ensure `address` is a string by providing a fallback
       const walletAddress: string = address ?? '';
   
-      // Validate challenge format
       const challengeRegex =
         /@frensbot\s+challenge\s+@(\w+):\s*Event:\s*(.+)\s*Wager:\s*(\d+(\.\d+)?)\s*(\w+)/i;
       const match = text.match(challengeRegex);
@@ -125,21 +122,38 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           },
         };
   
-        // Pass `walletAddress` safely
-        onPost(text, challengeDetails, walletAddress);
+        try {
+          const response = await fetch('http://localhost:3000/explore', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ challengeDetails, walletAddress }),
+          });
   
-        setText('');
-        setShowNotification(true); // Show notification
-        setTimeout(() => setShowNotification(false), 3000); // Auto-hide after 3 seconds
+          if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(`Failed to create challenge: ${errorMessage}`);
+          }
+  
+          setText('');
+          setShowNotification(true);
+          setTimeout(() => setShowNotification(false), 3000);
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error('Error:', error.message);
+            alert(error.message);
+          } else {
+            console.error('Unexpected error:', error);
+            alert('An unexpected error occurred.');
+          }
+        }
       } else {
-        // Show error for incorrect challenge format
-        alert(
-          'Invalid challenge format. Please use: @frensbot challenge @opponent: Event: [description] Wager: [amount] [currency]'
-        );
+        alert('Invalid challenge format. Please use: @frensbot challenge @opponent: Event: [description] Wager: [amount] [currency]');
       }
     }
   };
-  
+
 
   const handleModalConfirm = () => {
     if (challengeDetails) {
