@@ -32,7 +32,7 @@ export default function MobileNav() {
     { to: '/activities', icon: '🎉', label: 'Activities' },
     { to: '/home', icon: '🧭', label: 'Explore' },
     { to: '/leaderboard', icon: '🏆', label: 'Ranks' },
-    { to: '/notifications', icon: '🔔', label: 'Notifications' }
+    { to: '/dashboard', icon: '🔔', label: 'Dashboard' }
   ];
 
   return (

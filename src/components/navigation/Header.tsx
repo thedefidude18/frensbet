@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HelpCircle, Settings } from 'lucide-react';
+import { HelpCircle, Settings, Bell } from 'lucide-react'; // Bell icon
 import MobileMenu from './MobileMenu';
 import WalletConnect from '../wallet/WalletConnect';
 
@@ -29,12 +29,25 @@ export default function Header() {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // Simulate fetching notification count from an API or backend
+  useEffect(() => {
+    // Example: fetching the notification count from an API
+    const fetchNotificationCount = () => {
+      // Simulate an API call, replace this with actual logic
+      setNotificationCount(5); // This would be dynamic
+    };
+
+    fetchNotificationCount();
+  }, []);
+
   const navItems = [
     { to: '/', label: 'Challenge' },
     { to: '/activities', label: 'Activities' },
-    { to: '/home', label: ' Explore' },
+    { to: '/home', label: 'Explore' },
     { to: '/leaderboard', label: 'Ranks' },
-    { to: '/notifications', label: 'Notifications' },
+    { to: '/dashboard', label: 'Dashboard' },
   ];
 
   return (
@@ -63,8 +76,19 @@ export default function Header() {
         ))}
       </nav>
 
-      {/* WalletConnect Button */}
+      {/* Desktop Icons and WalletConnect */}
       <div className="hidden md:flex items-center gap-4">
+        {/* Notifications Icon with Badge */}
+        <Link to="/notifications" className="relative">
+          <Bell size={24} className="text-gray-600 hover:text-blue-500" />
+          {notificationCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {notificationCount}
+            </span>
+          )}
+        </Link>
+
+        {/* WalletConnect Button */}
         <WalletConnect />
       </div>
     </header>

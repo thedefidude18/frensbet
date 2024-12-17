@@ -7,6 +7,7 @@ import Activities from './pages/Activities';
 import Leaderboard from './pages/Leaderboard';
 import Notifications from './pages/Notifications';
 import Explore from './pages/Explore';
+import Dashboard from './components/Dashboard';
 import { usePageTitle } from './hooks/usePageTitle';
 
 function AppContent() {
@@ -22,6 +23,8 @@ function AppContent() {
   <Route path="/activities" element={<Activities />} />
   <Route path="/leaderboard" element={<Leaderboard />} />
   <Route path="/notifications" element={<Notifications />} />
+  <Route path="/dashboard" element={<Dashboard />} />
+
 </Routes>
       </main>
       <MobileNav />
