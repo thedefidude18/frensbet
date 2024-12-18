@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Image, Smile, Send } from 'lucide-react';
+import { Image, Send } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import PouchDB from 'pouchdb';
+
+// Initialize PouchDB
+const db = new PouchDB('challenges');
 
 // Define interface for challenge details
 interface ChallengeDetails {
@@ -12,15 +16,11 @@ interface ChallengeDetails {
   };
 }
 
-// Define props type for ComposeBox
-interface ComposeBoxProps {
-  onPost: (text: string, challengeDetails: ChallengeDetails, walletAddress: string) => void;
-  onSuggestUsers: (text: string) => string[]; // New prop to handle user suggestions
-}
-
-function Notification({ message, onClose }: { message: string; onClose: () => void }) {
+// Notification component
+function Notification({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
   return (
-    <div className="fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg flex items-center gap-2">
+    <div className={`fixed bottom-4 right-4 ${bgColor} text-white p-4 rounded-lg shadow-lg flex items-center gap-2`}>
       <span>{message}</span>
       <button onClick={onClose} className="text-white font-bold">
         &times;
@@ -29,74 +29,15 @@ function Notification({ message, onClose }: { message: string; onClose: () => vo
   );
 }
 
-function ChallengePreviewModal({
-  isOpen,
-  onClose,
-  challengeDetails,
-  onConfirm,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  challengeDetails: ChallengeDetails | null;
-  onConfirm: () => void;
-}) {
-  if (!isOpen || !challengeDetails) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-[#1a1b1f] text-white p-6 rounded-lg w-full max-w-md shadow-lg">
-        <h2 className="text-xl mb-4">Confirm Challenge</h2>
-        <div className="mb-4">
-          <p>
-            <strong>Challenged User:</strong> {challengeDetails.challengedUser}
-          </p>
-          <p>
-            <strong>Event:</strong> {challengeDetails.event}
-          </p>
-          <p>
-            <strong>Wager:</strong> {challengeDetails.wager.amount} {challengeDetails.wager.currency}
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <button
-            onClick={onClose}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-500"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
+// ComposeBox component
+function ComposeBox({ onPost, onSuggestUsers }: { onPost: (text: string, challengeDetails: ChallengeDetails, walletAddress: string) => void; onSuggestUsers: (text: string) => string[]; }) {
   const { address, isConnected } = useAccount(); // Get wallet connection status and address
   const [text, setText] = useState<string>('');
-  const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
-  const [showNotification, setShowNotification] = useState(false);
-  const [suggestedUsers, setSuggestedUsers] = useState<string[]>([]); // State for suggested users
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [challengeDetails, setChallengeDetails] = useState<ChallengeDetails | null>(null); // State for challenge details
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setText(value);
-
-    // Extract mentioned users
-    const matches = value.match(/@(\w+)/g) || [];
-    setMentionedUsers(matches.map((match) => match.slice(1)));
-
-    // Suggest users based on input text
-    const suggestions = onSuggestUsers(value);
-    setSuggestedUsers(suggestions);
+    setText(e.target.value);
   };
 
   const handlePost = async () => {
@@ -105,13 +46,12 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
         alert('Please connect your wallet to post a challenge.');
         return;
       }
-  
+
       const walletAddress: string = address ?? '';
-  
       const challengeRegex =
         /@frensbot\s+challenge\s+@(\w+):\s*Event:\s*(.+)\s*Wager:\s*(\d+(\.\d+)?)\s*(\w+)/i;
       const match = text.match(challengeRegex);
-  
+
       if (match) {
         const challengeDetails: ChallengeDetails = {
           challengedUser: match[1],
@@ -121,32 +61,27 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
             currency: match[5],
           },
         };
-  
+
         try {
-          const response = await fetch('http://localhost:3000/explore', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ challengeDetails, walletAddress }),
+          // Add the challenge to PouchDB
+          const response = await db.put({
+            _id: new Date().toISOString(),
+            text,
+            challengeDetails,
+            walletAddress,
+            createdAt: new Date().toISOString(),
           });
-  
-          if (!response.ok) {
-            const errorMessage = await response.text();
-            throw new Error(`Failed to create challenge: ${errorMessage}`);
-          }
-  
+
+          console.log('Challenge added to PouchDB:', response);
+
+          // Send message to Telegram
+          await sendTelegramMessage(challengeDetails, walletAddress);
+
           setText('');
-          setShowNotification(true);
-          setTimeout(() => setShowNotification(false), 3000);
+          setNotification({ message: 'Challenge posted! Awaiting acceptance or decline.', type: 'success' });
         } catch (error) {
-          if (error instanceof Error) {
-            console.error('Error:', error.message);
-            alert(error.message);
-          } else {
-            console.error('Unexpected error:', error);
-            alert('An unexpected error occurred.');
-          }
+          console.error('Error adding challenge or sending Telegram message:', error);
+          setNotification({ message: 'Failed to create challenge. Please try again.', type: 'error' });
         }
       } else {
         alert('Invalid challenge format. Please use: @frensbot challenge @opponent: Event: [description] Wager: [amount] [currency]');
@@ -154,28 +89,37 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
     }
   };
 
+  // Function to send a message to the Telegram channel
+  const sendTelegramMessage = async (challengeDetails: ChallengeDetails, walletAddress: string) => {
+    const message = `New Challenge Created!\n` +
+                    `Challenged User: ${challengeDetails.challengedUser}\n` +
+                    `Event: ${challengeDetails.event}\n` +
+                    `Wager: ${challengeDetails.wager.amount} ${challengeDetails.wager.currency}\n` +
+                    `Wallet Address: ${walletAddress}`;
 
-  const handleModalConfirm = () => {
-    if (challengeDetails) {
-      // Ensure `address` is a string by providing a fallback
-      const walletAddress: string = address ?? ''; // Fallback to empty string if undefined
-      onPost(text, challengeDetails, walletAddress);
+    const telegramToken = process.env.TELEGRAM_BOT_TOKEN || '7782603906:AAFze6up2PrXU52eVVxQaJ3pBSMJhuDEimw'; // Replace as needed
+    const chatId = process.env.TELEGRAM_CHAT_ID || '1002358557008'; // Replace as needed
+
+    const response = await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to send message to Telegram: ${errorMessage}`);
     }
-    setShowModal(false); // Close modal after confirmation
-    setShowNotification(true); // Show notification
-    setTimeout(() => setShowNotification(false), 3000); // Auto-hide after 3 seconds
   };
 
   return (
     <div className="bg-[#1a1b1f] text-white rounded-2xl p-4 w-full max-w-md shadow-lg mb-4 mx-auto">
       <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-4">
-          {mentionedUsers.length > 0 && (
-            <span className="text-xs text-gray-400">
-              Mentioning: {mentionedUsers.join(', ')}
-            </span>
-          )}
-        </div>
         <button className="text-gray-400 hover:text-white">&times;</button>
       </div>
       <div className="flex items-center gap-4 mb-2">
@@ -193,26 +137,7 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           className="bg-transparent flex-grow text-white placeholder-gray-500 focus:outline-none"
         />
       </div>
-      {/* Suggested users display */}
-      {suggestedUsers.length > 0 && (
-        <div className="mt-2 p-2 bg-gray-700 rounded-md">
-          <h3 className="text-sm text-gray-400">Suggested Opponents:</h3>
-          <ul className="text-white">
-            {suggestedUsers.map((user) => (
-              <li key={user} className="hover:bg-gray-600 p-1 rounded">
-                {user}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       <div className="flex justify-between items-center">
-        <div className="flex gap-4">
-          <button className="text-gray-400 hover:text-white">
-            <Image size={20} />
-          </button>
-          <button className="text-gray-400 hover:text-white">🔮</button>
-        </div>
         <button
           onClick={handlePost}
           className="bg-pink-500 text-white px-4 py-1 rounded-full hover:bg-purple-500 flex items-center"
@@ -221,24 +146,18 @@ function ComposeBox({ onPost, onSuggestUsers }: ComposeBoxProps) {
           Challenge
         </button>
       </div>
-      {showNotification && (
+      {notification && (
         <Notification
-          message="Challenge posted! Awaiting acceptance or decline."
-          onClose={() => setShowNotification(false)}
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
         />
       )}
-
-      {/* Challenge Preview Modal */}
-      <ChallengePreviewModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        challengeDetails={challengeDetails}
-        onConfirm={handleModalConfirm}
-      />
     </div>
   );
 }
 
+// Main Explore component
 export default function Explore() {
   // Function to simulate user suggestions based on input text
   const suggestUsers = (inputText: string): string[] => {
@@ -253,7 +172,7 @@ export default function Explore() {
     console.log('New challenge:', text);
     console.log('Challenge Details:', challengeDetails);
     console.log('Wallet Address:', walletAddress);
-    // Implement challenge submission logic
+    // Implement challenge submission logic as needed
   };
 
   return (
@@ -268,11 +187,11 @@ export default function Explore() {
           />
         </div>
         <h1
-  className="text-4xl md:text-6xl font-bold mb-4 text-pink-500"
-  style={{ fontFamily: 'UI Rounded, sans-serif' }}
->
-  frens.bet
-</h1>
+          className="text-4xl md:text-6xl font-bold mb-4 text-pink-500"
+          style={{ fontFamily: 'UI Rounded, sans-serif' }}
+        >
+          frens.bet
+        </h1>
         <p className="text-gray-400 text-lg mb-4">
           challenges your frens.
         </p>
